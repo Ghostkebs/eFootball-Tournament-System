@@ -1,0 +1,8 @@
+{
+  "name": "robinhood-tournament",
+  "version": "1.0.0",
+  "description": "eFootball-Tournament-System",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}
