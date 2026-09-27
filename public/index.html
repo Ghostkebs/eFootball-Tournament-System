@@ -566,10 +566,13 @@ async function doAddPlayer(){
   const already=(se.season_players||[]).map(p=>p.name||p);
   if(already.map(n=>n.toLowerCase()).includes(name.toLowerCase()))return toast('Already added',true);
   if(already.length>=8)return toast('Already have 8 players',true);
-  se.season_players=se.season_players||[];
-  se.season_players.push({name});
-  inp.value='';
-  renderApp();
+  try{
+    await POST('/seasons/add-player',{season_id:se.id,name});
+    await loadCycleData(UI.cycleId);
+    inp.value='';
+    renderApp();
+    toast(name+' added!');
+  }catch(e){toast(e.message,true)}
 }
 async function doQuickAdd(name){
   const se=DB.currentSeason;
