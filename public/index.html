@@ -482,10 +482,14 @@ function bindApp(){
   document.querySelectorAll('[data-qaplayer]').forEach(b=>b.onclick=()=>doQuickAdd(b.dataset.qaplayer));
 
   // Remove player chip
-  document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=()=>{
+document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=async()=>{
     const se=DB.currentSeason;
-    se.season_players=(se.season_players||[]).filter(p=>(p.name||p)!==b.dataset.rmplayer);
-    renderApp();
+    const name=b.dataset.rmplayer;
+    se.season_players=(se.season_players||[]).filter(p=>(p.name||p)!==name);
+    try{
+      await POST('/seasons/remove-player',{season_id:se.id,name});
+      renderApp();
+    }catch(e){toast(e.message,true);se.season_players.push({name});renderApp()}
   });
 
   // Go to matchup setup
