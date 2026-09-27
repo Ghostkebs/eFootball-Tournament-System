@@ -308,7 +308,7 @@ function renderPlay(){
   }
 
   // Step 1: Add players
-  if(!se.started&&(!se.season_players||se.season_players.length<8)){
+  if(!se.started&&(!se.season_players||se.season_players.length<8)&&UI._step!=='matchups'){
     const added=(se.season_players||[]).map(p=>p.name||p);
     const quick=DB.players.map(p=>p.name).filter(n=>!added.includes(n));
     return`<div class="card">${head}
@@ -323,7 +323,7 @@ function renderPlay(){
   }
 
   // Step 2: Set matchups
-  if(!se.started){
+  if(!se.started&&(UI._step==='matchups'||(se.season_players&&se.season_players.length>=8))){
     const added=(se.season_players||[]).map(p=>p.name||p);
     const opt=v=>added.map(n=>`<option ${n==v?'selected':''}>${n}</option>`).join('');
     return`<div class="card">${head}
@@ -340,6 +340,7 @@ function renderPlay(){
   return`<div class="card">${head}
     <p class="mu" style="margin-top:0">Enter scores and lock each match. Winners advance automatically.</p>
     ${renderBracket(se,isAdmin())}
+    ${isAdmin()?`<div class="row" style="margin-top:16px"><button class="btn red" id="btnCancelTournament">✕ Cancel Tournament</button></div>`:''}
   </div>`;
 }
 
@@ -481,15 +482,23 @@ function bindApp(){
   if(pnInput)pnInput.addEventListener('keydown',e=>{if(e.key==='Enter')doAddPlayer()});
 
   // Quick add
- const btnCancel=$('#btnCancelTournament');
-if(btnCancel)btnCancel.onclick=async()=>{
-  if(!confirm('Delete this tournament and all players?'))return;
-  try{
-    await POST('/seasons/cancel',{season_id:DB.currentSeason.id});
-    await loadCycleData(UI.cycleId);
-    toast('Tournament cancelled');
-  }catch(e){toast(e.message,true)}
-};
+  const btnCancel=$('#btnCancelTournament');
+  if(btnCancel)btnCancel.onclick=async()=>{
+    const se=DB.currentSeason;
+    const msg=se.started
+      ?'Cancel this tournament? All match results and player entries will be deleted. This cannot be undone.'
+      :'Cancel this tournament? All player entries will be removed.';
+    if(!confirm(msg))return;
+    btnCancel.disabled=true;
+    try{
+      await POST('/seasons/cancel',{season_id:se.id,force:true});
+      UI._step=null;
+      await loadCycleData(UI.cycleId);
+      await loadLeaderboard();
+      renderApp();
+      toast('Tournament cancelled');
+    }catch(e){toast(e.message,true);btnCancel.disabled=false}
+  };
   document.querySelectorAll('[data-qaplayer]').forEach(b=>b.onclick=()=>doQuickAdd(b.dataset.qaplayer));
 
   // Remove player chip
@@ -505,7 +514,11 @@ document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=async()=>{
 
   // Go to matchup setup
   const btnSM=$('#btnSetMatchups');
-  if(btnSM)btnSM.onclick=()=>{const se=DB.currentSeason;if(se.season_players.length===8){UI._step='matchups';renderApp()}};
+  if(btnSM)btnSM.onclick=()=>{
+    const se=DB.currentSeason;
+    if((se.season_players||[]).length===8){UI._step='matchups';renderApp()}
+    else toast('Need exactly 8 players first',true);
+  };
 
   // Shuffle
   const btnSh=$('#btnShuffle');
@@ -526,6 +539,7 @@ document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=async()=>{
     try{
       const se=DB.currentSeason;
       await POST('/bracket?season_id='+se.id,{matchups});
+      UI._step=null;
       await loadCycleData(UI.cycleId);
       await loadSeasonBracket(se.id);
       renderApp();
@@ -534,7 +548,7 @@ document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=async()=>{
 
   // Back to players step
   const btnBP=$('#btnBackPlayers');
-  if(btnBP)btnBP.onclick=()=>{const se=DB.currentSeason;se.started=false;renderApp()};
+  if(btnBP)btnBP.onclick=()=>{UI._step=null;renderApp()};
 
   // Lock match score
   document.querySelectorAll('[data-lockm]').forEach(b=>b.onclick=async()=>{
@@ -578,24 +592,41 @@ async function doAddPlayer(){
   const inp=$('#pn');if(!inp)return;
   const name=inp.value.trim();if(!name)return;
   const se=DB.currentSeason;
-  const already=(se.season_players||[]).map(p=>p.name||p);
+  se.season_players=se.season_players||[];
+  const already=se.season_players.map(p=>p.name||p);
   if(already.map(n=>n.toLowerCase()).includes(name.toLowerCase()))return toast('Already added',true);
   if(already.length>=8)return toast('Already have 8 players',true);
+  // Optimistic update — add locally first, then persist
+  se.season_players.push({name});
+  inp.value='';
+  renderApp();
   try{
     await POST('/seasons/add-player',{season_id:se.id,name});
-    await loadCycleData(UI.cycleId);
-    inp.value='';
-    renderApp();
     toast(name+' added!');
-  }catch(e){toast(e.message,true)}
+  }catch(e){
+    // Rollback on failure
+    se.season_players=se.season_players.filter(p=>(p.name||p)!==name);
+    renderApp();
+    toast(e.message,true);
+  }
 }
 async function doQuickAdd(name){
   const se=DB.currentSeason;
-  const already=(se.season_players||[]).map(p=>p.name||p);
-  if(already.length>=8)return toast('Already have 8 players',true);
   se.season_players=se.season_players||[];
+  const already=se.season_players.map(p=>p.name||p);
+  if(already.length>=8)return toast('Already have 8 players',true);
+  if(already.map(n=>n.toLowerCase()).includes(name.toLowerCase()))return toast('Already added',true);
+  // Optimistic update
   se.season_players.push({name});
   renderApp();
+  try{
+    await POST('/seasons/add-player',{season_id:se.id,name});
+    toast(name+' added!');
+  }catch(e){
+    se.season_players=se.season_players.filter(p=>(p.name||p)!==name);
+    renderApp();
+    toast(e.message,true);
+  }
 }
 
 /* ── FULL DATA LOAD AFTER CYCLE SWITCH ── */
