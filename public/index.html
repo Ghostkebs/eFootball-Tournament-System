@@ -1,0 +1,605 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Robinhood Tournament of Champions</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090b;--s:#131317;--s2:#1b1b21;--b:#2b2b34;--t:#f3efe6;--m:#8b8994;--g:#d6b26a;--g2:#f2dca4;--ok:#5fd0a0;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--t);font:14px/1.5 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}
+#bgc{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;background:radial-gradient(900px 500px at 50% -80px,#2a2314,transparent),var(--bg)}
+.w{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:26px 0 16px}
+.logo{font-weight:800;font-size:26px;letter-spacing:.42em;background:linear-gradient(90deg,var(--g2),var(--g),var(--g2));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(-14px) scale(.94);animation:enter .9s cubic-bezier(.2,.9,.25,1) .1s forwards,shine 5s linear 1.2s infinite}
+@keyframes enter{60%{opacity:1;transform:translateY(2px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes shine{to{background-position:200% center}}
+.pill{opacity:0;animation:fadein .7s ease .55s forwards}
+@keyframes fadein{to{opacity:1}}
+.pill{border:1px solid var(--b);background:var(--s);border-radius:99px;padding:6px 14px;font-size:12px;color:var(--m)}.pill b{color:var(--g2)}
+.hright{display:flex;align-items:center;gap:10px}
+.uinfo{font-size:12px;color:var(--m)}.uinfo b{color:var(--g2)}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--b);margin-bottom:20px;overflow-x:auto;position:relative}
+nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--m);font:600 13px Manrope,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:12px 16px;cursor:pointer;white-space:nowrap;transition:color .25s}
+nav button.on{color:var(--g2)}
+#ul{position:absolute;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--g2),var(--g));border-radius:2px;transition:left .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 10px #d6b26a80}
+main{display:block}
+main.sw{animation:swap .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes swap{0%{opacity:0;transform:translateY(10px) scale(.985)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.card,.pc,tr[data-a],.mt{opacity:0;animation:rise .45s cubic-bezier(.2,.8,.2,1) forwards}
+.card{animation-delay:.02s}
+.grid .pc:nth-child(1){animation-delay:.03s}.grid .pc:nth-child(2){animation-delay:.07s}.grid .pc:nth-child(3){animation-delay:.11s}.grid .pc:nth-child(4){animation-delay:.15s}.grid .pc:nth-child(5){animation-delay:.19s}.grid .pc:nth-child(6){animation-delay:.23s}.grid .pc:nth-child(n+7){animation-delay:.26s}
+table tr:nth-child(1){animation-delay:.03s}table tr:nth-child(2){animation-delay:.06s}table tr:nth-child(3){animation-delay:.09s}table tr:nth-child(4){animation-delay:.12s}table tr:nth-child(5){animation-delay:.15s}table tr:nth-child(n+6){animation-delay:.18s}
+table tr:first-child{opacity:1;animation:none}
+.br .mt:nth-child(1){animation-delay:.05s}.br .mt:nth-child(2){animation-delay:.1s}.br .mt:nth-child(3){animation-delay:.15s}.br .mt:nth-child(4){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tb{background:var(--s);border:1px solid var(--b);color:var(--m);border-radius:10px;padding:8px 14px;font:600 13px Manrope,system-ui,sans-serif;cursor:pointer;transition:transform .15s,background .2s,color .2s,border-color .2s}
+.tb:active{transform:scale(.94)}
+.tb.on{color:#1a1405;background:linear-gradient(135deg,var(--g2),var(--g));border-color:var(--g)}
+.tb:disabled{opacity:.35;cursor:default}
+.md{animation:mfade .25s ease}
+.mb{animation:mpop .3s cubic-bezier(.2,.8,.25,1)}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+@keyframes mpop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card{background:linear-gradient(180deg,var(--s),#101014);backdrop-filter:blur(6px);border:1px solid var(--b);border-radius:16px;padding:20px;margin-bottom:18px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+h2{margin:0;font-size:18px}h3{margin:0 0 10px;font-size:15px}
+h4{margin:0 0 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--m)}
+.tag{font-size:11px;color:var(--g2);border:1px solid #4a3d1f;background:#1d1809;border-radius:99px;padding:3px 10px}
+.mu{color:var(--m)}
+.sc{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--m);text-align:left;padding:8px 10px;border-bottom:1px solid var(--b)}
+td{padding:12px 10px;border-bottom:1px solid #1e1e25}
+tr[data-a]{cursor:pointer}tr[data-a]:hover td{background:#17171d}
+.rk{font-weight:800;color:var(--m);width:44px}tr:nth-child(2) .rk,tr:nth-child(2) td:nth-child(2){color:var(--g2)}
+.pt{font-weight:800;color:var(--g2)}td i{color:var(--m);font-style:normal;font-size:12px}
+.br{display:grid;grid-template-columns:repeat(3,minmax(210px,1fr));gap:18px;overflow-x:auto;padding-bottom:6px}
+.col{display:flex;flex-direction:column;gap:12px;justify-content:space-around}
+.mt{background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:8px}
+.mt.live{border-color:var(--g);box-shadow:0 0 0 3px #d6b26a1a}
+.tm{display:flex;justify-content:space-between;padding:6px 8px;border-radius:8px;color:var(--m)}
+.tm.w{color:var(--t);font-weight:800;background:#d6b26a14}.tm.w b{color:var(--g2)}
+.in{display:flex;gap:6px;margin-top:6px}
+input,select{background:#0c0c0f;border:1px solid var(--b);color:var(--t);border-radius:10px;padding:9px 10px;font:600 14px Manrope,system-ui,sans-serif;min-width:0}
+.in input{width:52px}
+input:focus,select:focus{outline:2px solid var(--g);outline-offset:1px}
+.btn{background:linear-gradient(135deg,var(--g2),var(--g));color:#1a1405;border:0;border-radius:10px;padding:10px 18px;font:800 13px Manrope,system-ui,sans-serif;cursor:pointer}
+.btn.gh{background:none;border:1px solid var(--b);color:var(--t)}.btn.red{background:none;border:1px solid #c0392b;color:#e74c3c}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--s2);border:1px solid var(--b);border-radius:99px;padding:6px 12px;font-weight:600;cursor:pointer;color:var(--t)}
+.pr{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:10px}.pr select{width:100%}
+.pr span{color:var(--m);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.pc{cursor:pointer;background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:14px}.pc:hover{border-color:var(--g)}
+.pc b{display:block;font-size:16px}.pc span{color:var(--m);font-size:12px}
+.md{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.mb{background:var(--s);border:1px solid var(--g);border-radius:18px;padding:24px;max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.st div{background:var(--s2);border-radius:12px;padding:10px;text-align:center}.st b{display:block;font-size:20px;color:var(--g2)}.st span{font-size:11px;color:var(--m)}
+.ln{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #1e1e25}
+#ts{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--g);color:#1a1405;font-weight:800;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:10}
+#ts.on{opacity:1}
+#ts.err{background:#c0392b;color:#fff}
+/* Auth screen */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-box{background:var(--s);border:1px solid var(--b);border-radius:20px;padding:32px;width:100%;max-width:380px}
+.auth-box h2{margin:0 0 6px;font-size:22px}
+.auth-box p{color:var(--m);margin:0 0 24px;font-size:13px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;font-weight:600;color:var(--m);letter-spacing:.08em;text-transform:uppercase}
+.field input{width:100%;font-size:14px}
+.auth-box .btn{width:100%;padding:12px;font-size:14px;margin-top:6px}
+.auth-switch{text-align:center;margin-top:16px;color:var(--m);font-size:13px}
+.auth-switch button{background:none;border:0;color:var(--g2);font:600 13px Manrope,sans-serif;cursor:pointer;padding:0}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #1a140566;border-top-color:#1a1405;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:40px;color:var(--m)}
+.loading .spin{border-color:var(--b);border-top-color:var(--g);width:24px;height:24px;margin:0 auto 12px;display:block}
+</style></head>
+<body>
+<canvas id="bgc"></canvas>
+<div id="root"></div>
+<div id="mod"></div>
+<div id="ts"></div>
+
+<script>
+/* ── BACKGROUND CANVAS ── */
+(function(){const c=document.getElementById('bgc'),x=c.getContext('2d');let W,H,pts=[];
+function size(){W=c.width=innerWidth;H=c.height=innerHeight}
+function init(){size();const n=Math.min(70,Math.floor(W/22));pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.6+.6}))}
+function step(){x.clearRect(0,0,W,H);
+ for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+  x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle='rgba(214,178,106,.55)';x.fill()}
+ for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+  if(d<120){x.strokeStyle='rgba(214,178,106,'+(0.14*(1-d/120))+')';x.lineWidth=1;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}
+ requestAnimationFrame(step)}
+addEventListener('resize',size);init();step();})();
+</script>
+
+<script>
+/* ── STATE ── */
+const PTS=[100,70,50,35,20,20,20,20];
+const ord=n=>n==5?'5th–8th':n+(['st','nd','rd'][n-1]||'th');
+const $=q=>document.querySelector(q);
+const root=$('#root');
+
+let AUTH={token:null,user:null};
+let DB={cycles:[],currentCycle:null,currentSeason:null,players:[]};
+let UI={view:'board',cycleId:null,seasonN:null,loading:false};
+
+/* ── AUTH HELPERS ── */
+function saveAuth(token,user){AUTH={token,user};try{localStorage.setItem('rtoc_token',token);localStorage.setItem('rtoc_user',JSON.stringify(user))}catch(e){}}
+function loadAuth(){try{const t=localStorage.getItem('rtoc_token'),u=localStorage.getItem('rtoc_user');if(t&&u){AUTH={token:t,user:JSON.parse(u)};return true}}catch(e){}return false}
+function clearAuth(){AUTH={token:null,user:null};try{localStorage.removeItem('rtoc_token');localStorage.removeItem('rtoc_user')}catch(e){}}
+const isAdmin=()=>AUTH.user&&(AUTH.user.role==='admin'||AUTH.user.role==='moderator');
+
+/* ── API ── */
+async function api(method,path,body){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(AUTH.token)opts.headers['Authorization']='Bearer '+AUTH.token;
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch('/api'+path,opts);
+  const data=await res.json().catch(()=>({}));
+  if(res.status===401){clearAuth();renderAuth();throw new Error('Session expired')}
+  if(!res.ok)throw new Error(data.error||'Request failed');
+  return data;
+}
+const GET=p=>api('GET',p);
+const POST=(p,b)=>api('POST',p,b);
+
+/* ── TOAST ── */
+let toastTimer;
+function toast(msg,err=false){const t=$('#ts');t.textContent=msg;t.className='on'+(err?' err':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',2400)}
+
+/* ── LOADING ── */
+function renderLoading(msg='Loading...'){root.innerHTML=`<div class="w"><div class="loading"><span class="spin"></span>${msg}</div></div>`}
+
+/* ── AUTH SCREEN ── */
+let authMode='login';
+function renderAuth(){
+  root.innerHTML=`<div class="auth-wrap"><div class="auth-box">
+    <div class="logo" style="font-size:16px;letter-spacing:.3em;margin-bottom:20px;display:block;opacity:1;transform:none;animation:none;background:linear-gradient(90deg,var(--g2),var(--g),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800">Robinhood Tournament</div>
+    <h2>${authMode==='login'?'Welcome back':'Create account'}</h2>
+    <p>${authMode==='login'?'Sign in to continue':'Enter your details below'}</p>
+    <div class="field"><label>Username</label><input id="au" type="text" placeholder="Your username" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="ap" type="password" placeholder="Password" autocomplete="${authMode==='login'?'current-password':'new-password'}"></div>
+    ${authMode==='register'?`<div class="field"><label>Role code (optional)</label><input id="arc" type="text" placeholder="Admin code if you have one"></div>`:''}
+    <button class="btn" id="asub">Sign ${authMode==='login'?'in':'up'}</button>
+    <div class="auth-switch">${authMode==='login'?'No account?':'Have an account?'} <button id="atog">${authMode==='login'?'Register':'Sign in'}</button></div>
+  </div></div>`;
+  $('#asub').onclick=doAuth;
+  $('#atog').onclick=()=>{authMode=authMode==='login'?'register':'login';renderAuth()};
+  $('#au').focus();
+  [$('#au'),$('#ap')].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()}));
+}
+
+async function doAuth(){
+  const u=$('#au').value.trim(),p=$('#ap').value;
+  if(!u||!p)return toast('Enter username and password',true);
+  const btn=$('#asub');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Signing in…';
+  try{
+    let data;
+    if(authMode==='login'){
+      data=await POST('/auth/login',{username:u,password:p});
+    }else{
+      const rc=$('#arc');
+      const role=rc&&rc.value.trim()==='RTOC_ADMIN_2026'?'admin':'viewer';
+      data=await POST('/auth/register',{username:u,password:p,role});
+    }
+    saveAuth(data.token,data.user);
+    init();
+  }catch(e){toast(e.message,true);btn.disabled=false;btn.innerHTML='Sign '+(authMode==='login'?'in':'up')}
+}
+
+/* ── INIT / DATA LOAD ── */
+async function init(){
+  renderLoading('Loading tournament data…');
+  try{
+    const{cycles}=await GET('/cycles');
+    DB.cycles=cycles||[];
+    if(DB.cycles.length===0){
+      // Auto-create first cycle if admin
+      if(isAdmin()){await POST('/cycles');const{cycles:c2}=await GET('/cycles');DB.cycles=c2||[]}
+    }
+    if(DB.cycles.length>0){
+      UI.cycleId=UI.cycleId||DB.cycles[DB.cycles.length-1].id;
+      await loadCycleData(UI.cycleId);
+    }
+    const{players}=await GET('/players');
+    DB.players=players||[];
+    render();
+  }catch(e){toast(e.message,true);renderLoading('Failed to load. Retrying…');setTimeout(init,3000)}
+}
+
+async function loadCycleData(cycleId){
+  const{seasons}=await GET('/seasons?cycle_id='+cycleId);
+  DB.seasons=seasons||[];
+  DB.currentCycle=DB.cycles.find(c=>c.id==cycleId)||DB.cycles[DB.cycles.length-1];
+  DB.currentSeason=DB.seasons.filter(s=>!s.done).sort((a,b)=>a.season_number-b.season_number)[0]
+    ||DB.seasons[DB.seasons.length-1];
+}
+
+/* ── POLL every 5s when on play view ── */
+let pollTimer;
+function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(UI.view==='play'&&UI.cycleId){await loadCycleData(UI.cycleId);renderApp()}},5000)}
+function stopPoll(){clearInterval(pollTimer)}
+
+/* ── RENDER SHELL ── */
+function render(){
+  const cyc=DB.currentCycle;
+  const se=DB.currentSeason;
+  const pillTxt=!cyc?'No cycles yet':(se&&!se.done?`Cycle <b>${cyc.cycle_number}</b> · Season <b>${se.season_number}</b> of 10`:`Cycle <b>${cyc.cycle_number}</b> complete`);
+  root.innerHTML=`<div class="w">
+    <header>
+      <div class="logo">Robinhood Tournament of Champions</div>
+      <div class="hright">
+        <div class="pill" id="pill">${pillTxt}</div>
+        <span class="uinfo"><b>${AUTH.user?.username||''}</b> <span style="color:var(--m)">${AUTH.user?.role||''}</span></span>
+        <button class="btn gh" id="logout" style="padding:6px 12px;font-size:12px">Logout</button>
+      </div>
+    </header>
+    <nav id="nav"></nav>
+    <main id="app"></main>
+  </div>`;
+  $('#logout').onclick=()=>{clearAuth();stopPoll();renderAuth()};
+  renderNav();
+  renderApp();
+  startPoll();
+}
+
+function renderNav(){
+  const tabs=[['board','Leaderboard'],['play','Current Season'],['seasons','Seasons'],['players','Players']];
+  $('#nav').innerHTML=tabs.map(([v,t])=>`<button class="${UI.view==v?'on':''}" data-nav="${v}">${t}</button>`).join('')+'<span id="ul"></span>';
+  $('#nav').querySelectorAll('button[data-nav]').forEach(b=>b.onclick=()=>{UI.view=b.dataset.nav;renderApp();moveUl()});
+  moveUl();
+}
+
+function moveUl(){const on=$('#nav')&&$('#nav').querySelector('button.on'),ul=$('#ul');if(!on||!ul)return;ul.style.left=on.offsetLeft+'px';ul.style.width=on.offsetWidth+'px'}
+addEventListener('resize',moveUl);
+
+function renderApp(){
+  const app=$('#app');if(!app)return;
+  const views={board:renderBoard,play:renderPlay,seasons:renderSeasons,players:renderPlayers};
+  app.innerHTML=(views[UI.view]||renderBoard)();
+  app.classList.remove('sw');void app.offsetWidth;app.classList.add('sw');
+  bindApp();
+}
+
+/* ── CYCLE TABS ── */
+function cycleTabs(){
+  return`<div class="tabs">${DB.cycles.map(c=>`<button class="tb ${c.id==UI.cycleId?'on':''}" data-switchchcycle="${c.id}">Cycle ${c.cycle_number}</button>`).join('')}</div>`;
+}
+
+/* ── BOARD ── */
+function renderBoard(){
+  if(!DB.cycles.length)return`<div class="card"><p class="mu">No cycles yet. ${isAdmin()?'Go to Current Season to start.':''}</p></div>`;
+  const lb=DB.leaderboard||[];
+  const cyc=DB.currentCycle;
+  const done=DB.seasons?DB.seasons.filter(s=>s.done).length:0;
+  return cycleTabs()+`<div class="card">
+    <div class="ch"><h2>Cycle ${cyc?.cycle_number||''} Leaderboard</h2><span class="tag">${done==10?'Final':done+' / 10 seasons'}</span></div>
+    ${lb.length?`<div class="sc"><table><tr><th>#</th><th>Player</th><th>Points</th><th>Best finish</th><th>Streak</th><th>Seasons</th></tr>
+    ${lb.map((r,i)=>`<tr data-a="pf" data-n="${r.name}"><td class="rk">${i+1}</td><td><b>${r.name}</b></td><td class="pt">${r.points}</td><td>${ord(r.best_finish)}</td><td>${r.current_streak} <i>best ${r.best_streak}</i></td><td>${r.seasons_played}</td></tr>`).join('')}
+    </table></div>`:'<p class="mu">No completed seasons yet in this cycle.</p>'}
+  </div>`;
+}
+
+/* ── PLAY ── */
+function renderPlay(){
+  if(!DB.cycles.length){
+    if(!isAdmin())return`<div class="card"><p class="mu">No active season. Ask your admin to start one.</p></div>`;
+    return`<div class="card"><h2>Welcome</h2><p class="mu">No cycles exist yet. Start the first one to begin.</p><button class="btn" id="btnNewCycle">Start Cycle 1</button></div>`;
+  }
+  const se=DB.currentSeason;
+  if(!se)return`<div class="card"><p class="mu">No active season.</p></div>`;
+  const cycNum=DB.currentCycle?.cycle_number||'';
+  const head=`<div class="ch"><h2>Cycle ${cycNum} · Season ${se.season_number}</h2><span class="tag">${se.done?'Locked':se.started?'In play':se.season_players?.length>=8?'Step 2 of 3':'Step 1 of 3'}</span></div>`;
+
+  // Season done — show results + next season or new cycle
+  if(se.done){
+    const allDone=DB.seasons.every(s=>s.done)&&DB.seasons.length>=10;
+    return`<div class="card">${head}
+      ${renderBracket(se,false)}
+      ${isAdmin()?`<div class="row" style="margin-top:16px">
+        ${allDone?`<button class="btn" id="btnNewCycle">Start New Cycle</button>`:
+          `<button class="btn" id="btnNextSeason">Start Season ${se.season_number+1}</button>`}
+      </div>`:''}
+    </div>`;
+  }
+
+  // Step 1: Add players
+  if(!se.started&&(!se.season_players||se.season_players.length<8)){
+    const added=(se.season_players||[]).map(p=>p.name||p);
+    const quick=DB.players.map(p=>p.name).filter(n=>!added.includes(n));
+    return`<div class="card">${head}
+      <h3>Add players (${added.length}/8)</h3>
+      <div class="row"><input id="pn" placeholder="Player name" maxlength="30"><button class="btn" id="btnAddPlayer">Add</button></div>
+      <div class="row" style="margin:14px 0">${added.map(p=>`<span class="chip" data-rmplayer="${p}">${p} ✕</span>`).join('')||'<span class="mu">No players yet</span>'}</div>
+      ${quick.length&&isAdmin()?`<h4>Quick add</h4><div class="row">${quick.slice(0,12).map(p=>`<span class="chip" data-qaplayer="${p}">+ ${p}</span>`).join('')}</div>`:''}
+      ${added.length===8&&isAdmin()?`<button class="btn" id="btnSetMatchups" style="margin-top:12px">Set Matchups →</button>`:''}
+    </div>`;
+  }
+
+  // Step 2: Set matchups
+  if(!se.started){
+    const added=(se.season_players||[]).map(p=>p.name||p);
+    const opt=v=>added.map(n=>`<option ${n==v?'selected':''}>${n}</option>`).join('');
+    return`<div class="card">${head}
+      <h3>Set the quarterfinal matchups</h3>
+      ${[0,1,2,3].map(i=>`<div class="pr"><select class="ps">${opt(added[i*2])}</select><span>VS</span><select class="ps">${opt(added[i*2+1])}</select></div>`).join('')}
+      <div class="row" style="margin-top:14px">
+        ${isAdmin()?`<button class="btn" id="btnStartBracket">Start Bracket</button><button class="btn gh" id="btnShuffle">Shuffle</button>`:''}
+        <button class="btn gh" id="btnBackPlayers">← Change Players</button>
+      </div>
+    </div>`;
+  }
+
+  // Step 3: Bracket in play
+  return`<div class="card">${head}
+    <p class="mu" style="margin-top:0">Enter scores and lock each match. Winners advance automatically.</p>
+    ${renderBracket(se,isAdmin())}
+  </div>`;
+}
+
+/* ── BRACKET RENDERER ── */
+function renderBracket(se,editable){
+  const matches=se.matches||DB.bracketMatches||[];
+  const byRound={qf:[],sf:[],final:[],third:[]};
+  matches.forEach(m=>{if(byRound[m.round]!==undefined)byRound[m.round].push(m)});
+  byRound.qf.sort((a,b)=>a.match_index-b.match_index);
+  byRound.sf.sort((a,b)=>a.match_index-b.match_index);
+
+  const mc=(m)=>{
+    if(!m)return`<div class="mt"><div class="tm">TBD</div><div class="tm">TBD</div></div>`;
+    const w=m.winner_id;
+    const rowA=`<div class="tm ${w&&w==m.player_a_id?'w':''}"><span>${m.player_a_name||'TBD'}</span>${m.score_a!=null?`<b>${m.score_a}</b>`:''}</div>`;
+    const rowB=`<div class="tm ${w&&w==m.player_b_id?'w':''}"><span>${m.player_b_name||'TBD'}</span>${m.score_b!=null?`<b>${m.score_b}</b>`:''}</div>`;
+    const canScore=editable&&m.player_a_id&&m.player_b_id&&!m.locked;
+    return`<div class="mt ${canScore?'live':''}">${rowA}${rowB}
+      ${canScore?`<div class="in"><input type="number" min="0" id="sa${m.id}" placeholder="0"><input type="number" min="0" id="sb${m.id}" placeholder="0"><button class="btn" data-lockm="${m.id}">Lock</button></div>`:''}
+    </div>`;
+  };
+
+  const qfHtml=[0,1,2,3].map(i=>mc(byRound.qf[i])).join('');
+  const sfHtml=[0,1].map(i=>mc(byRound.sf[i])).join('');
+  const fHtml=mc(byRound.final[0]);
+  const tHtml=mc(byRound.third[0]);
+
+  return`<div class="br">
+    <div class="col"><h4>Quarterfinals</h4>${qfHtml}</div>
+    <div class="col"><h4>Semifinals</h4>${sfHtml}</div>
+    <div class="col"><div><h4>Final</h4>${fHtml}</div><div><h4>3rd Place</h4>${tHtml}</div></div>
+  </div>`;
+}
+
+/* ── SEASONS ── */
+function renderSeasons(){
+  if(!DB.cycles.length)return`<div class="card"><p class="mu">No cycles yet.</p></div>`;
+  const seasons=DB.seasons||[];
+  const curSn=UI.seasonN||(seasons.filter(s=>s.done).slice(-1)[0]?.season_number||0);
+  const se=seasons.find(s=>s.season_number==curSn);
+
+  const seasonTabs=Array.from({length:10},(_,i)=>{
+    const s=seasons.find(s=>s.season_number==i+1);
+    const ok=s&&s.done,lv=s&&!s.done&&s.started;
+    return`<button class="tb ${curSn==i+1?'on':''}" ${s?'':'disabled'} data-ssn="${i+1}">S${i+1}${lv?' •':''}</button>`;
+  }).join('');
+
+  if(!se||!se.done)return cycleTabs()+`<div class="tabs">${seasonTabs}</div><div class="card"><p class="mu">No completed seasons yet.</p></div>`;
+
+  const matches=se.matches||[];
+  const placements=se.season_players||[];
+  const sorted=[...placements].sort((a,b)=>(a.placement||9)-(b.placement||9));
+
+  return cycleTabs()+`<div class="tabs">${seasonTabs}</div>
+    <div class="card"><div class="ch"><h2>Cycle ${DB.currentCycle?.cycle_number} · Season ${se.season_number}</h2><span class="tag">Locked</span></div>
+    ${renderBracket(se,false)}
+    </div>
+    <div class="card"><h3>Final Placements</h3>
+    ${sorted.map(p=>`<div class="ln"><span>${ord(p.placement||5)} &nbsp;<b>${p.name||p.player_name||''}</b></span><span class="pt">+${PTS[(p.placement||5)-1]}</span></div>`).join('')}
+    </div>`;
+}
+
+/* ── PLAYERS ── */
+function renderPlayers(){
+  const pl=DB.players||[];
+  return`<div class="card"><div class="ch"><h2>All Players</h2><span class="tag">${pl.length} on record</span></div>
+    <div class="grid">${pl.map(p=>`<div class="pc" data-a="pf" data-n="${p.name}">
+      <b>${p.name}</b>
+      <span>${p.career_points||0} career pts · ${p.seasons_played||0} seasons · ${p.titles||0} titles</span>
+    </div>`).join('')||'<p class="mu">No players yet.</p>'}
+    </div></div>`;
+}
+
+/* ── PLAYER PROFILE MODAL ── */
+async function showProfile(name){
+  $('#mod').innerHTML=`<div class="md"><div class="mb"><p class="mu">Loading…</p></div></div>`;
+  try{
+    const d=await GET('/players/profile?name='+encodeURIComponent(name));
+    const p=d.player,c=d.career,cycs=d.cycles||[];
+    $('#mod').innerHTML=`<div class="md" id="mdBack"><div class="mb">
+      <div class="ch"><h2>${p.name}</h2><button class="btn gh" id="closemod">Close</button></div>
+      <div class="st">
+        <div><b>${c.points}</b><span>Career pts</span></div>
+        <div><b>${c.titles}</b><span>Titles</span></div>
+        <div><b>${c.podiums}</b><span>Podiums</span></div>
+        <div><b>${c.seasons_played}</b><span>Seasons</span></div>
+        <div><b>${c.best_finish?ord(c.best_finish):'–'}</b><span>Best finish</span></div>
+      </div>
+      <h4>Cycle by cycle</h4>
+      ${cycs.map(cy=>`<div class="ln"><span>Cycle ${cy.cycle_number}</span><span class="pt">${cy.points} pts · ${cy.titles} titles</span></div>`).join('')||'<p class="mu">No results yet.</p>'}
+    </div></div>`;
+    $('#closemod').onclick=()=>$('#mod').innerHTML='';
+    $('#mdBack').onclick=e=>{if(e.target.id==='mdBack')$('#mod').innerHTML=''};
+  }catch(e){$('#mod').innerHTML='';toast(e.message,true)}
+}
+
+/* ── BIND EVENTS ── */
+function bindApp(){
+  // Cycle switch
+  document.querySelectorAll('[data-switchchcycle]').forEach(b=>b.onclick=async()=>{
+    UI.cycleId=+b.dataset.switchchcycle;
+    await loadCycleData(UI.cycleId);
+    await loadLeaderboard();
+    renderApp();moveUl();
+  });
+
+  // Season tabs
+  document.querySelectorAll('[data-ssn]').forEach(b=>b.onclick=async()=>{
+    UI.seasonN=+b.dataset.ssn;
+    const se=DB.seasons.find(s=>s.season_number==UI.seasonN);
+    if(se){await loadSeasonBracket(se.id);DB.seasons.find(s=>s.id==se.id).matches=DB.bracketMatches}
+    renderApp();
+  });
+
+  // Player profile
+  document.querySelectorAll('[data-a="pf"]').forEach(b=>b.onclick=()=>showProfile(b.dataset.n));
+
+  // New cycle
+  const btnNC=$('#btnNewCycle');
+  if(btnNC)btnNC.onclick=async()=>{
+    if(!confirm('Start a new cycle?'))return;
+    btnNC.disabled=true;
+    try{await POST('/cycles');const{cycles}=await GET('/cycles');DB.cycles=cycles;UI.cycleId=cycles[cycles.length-1].id;await loadCycleData(UI.cycleId);UI.view='play';render()}
+    catch(e){toast(e.message,true);btnNC.disabled=false}
+  };
+
+  // Next season
+  const btnNS=$('#btnNextSeason');
+  if(btnNS)btnNS.onclick=async()=>{
+    btnNS.disabled=true;
+    try{await POST('/seasons?cycle_id='+UI.cycleId);await loadCycleData(UI.cycleId);renderApp()}
+    catch(e){toast(e.message,true);btnNS.disabled=false}
+  };
+
+  // Add player
+  const btnAP=$('#btnAddPlayer');
+  if(btnAP)btnAP.onclick=()=>doAddPlayer();
+  const pnInput=$('#pn');
+  if(pnInput)pnInput.addEventListener('keydown',e=>{if(e.key==='Enter')doAddPlayer()});
+
+  // Quick add
+  document.querySelectorAll('[data-qaplayer]').forEach(b=>b.onclick=()=>doQuickAdd(b.dataset.qaplayer));
+
+  // Remove player chip
+  document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=()=>{
+    const se=DB.currentSeason;
+    se.season_players=(se.season_players||[]).filter(p=>(p.name||p)!==b.dataset.rmplayer);
+    renderApp();
+  });
+
+  // Go to matchup setup
+  const btnSM=$('#btnSetMatchups');
+  if(btnSM)btnSM.onclick=()=>{const se=DB.currentSeason;if(se.season_players.length===8){UI._step='matchups';renderApp()}};
+
+  // Shuffle
+  const btnSh=$('#btnShuffle');
+  if(btnSh)btnSh.onclick=()=>{
+    const ps=[...document.querySelectorAll('.ps')];
+    const vals=ps.map(s=>s.value).sort(()=>Math.random()-.5);
+    ps.forEach((s,i)=>s.value=vals[i]);
+  };
+
+  // Start bracket
+  const btnSB=$('#btnStartBracket');
+  if(btnSB)btnSB.onclick=async()=>{
+    const selects=[...document.querySelectorAll('.ps')];
+    const vals=selects.map(s=>s.value);
+    if(new Set(vals).size<8)return toast('Each player can only appear once',true);
+    const matchups=[[vals[0],vals[1]],[vals[2],vals[3]],[vals[4],vals[5]],[vals[6],vals[7]]];
+    btnSB.disabled=true;
+    try{
+      const se=DB.currentSeason;
+      await POST('/bracket?season_id='+se.id,{matchups});
+      await loadCycleData(UI.cycleId);
+      await loadSeasonBracket(se.id);
+      renderApp();
+    }catch(e){toast(e.message,true);btnSB.disabled=false}
+  };
+
+  // Back to players step
+  const btnBP=$('#btnBackPlayers');
+  if(btnBP)btnBP.onclick=()=>{const se=DB.currentSeason;se.started=false;renderApp()};
+
+  // Lock match score
+  document.querySelectorAll('[data-lockm]').forEach(b=>b.onclick=async()=>{
+    const mid=b.dataset.lockm;
+    const sa=$('#sa'+mid),sb=$('#sb'+mid);
+    if(!sa||!sb||sa.value===''||sb.value==='')return toast('Enter both scores',true);
+    const a=+sa.value,bv=+sb.value;
+    if(a===bv)return toast('Knockout matches need a winner',true);
+    b.disabled=true;
+    try{
+      await POST('/matches/result',{match_id:+mid,score_a:a,score_b:bv});
+      const se=DB.currentSeason;
+      await loadCycleData(UI.cycleId);
+      await loadSeasonBracket(se.id);
+      const{players}=await GET('/players');DB.players=players;
+      await loadLeaderboard();
+      if(DB.currentSeason?.done)toast('Season locked! Points awarded 🏆');
+      renderApp();
+    }catch(e){toast(e.message,true);b.disabled=false}
+  });
+}
+
+/* ── DATA HELPERS ── */
+async function loadLeaderboard(){
+  if(!UI.cycleId)return;
+  try{const d=await GET('/leaderboard?cycle_id='+UI.cycleId);DB.leaderboard=d.leaderboard||[]}
+  catch(e){}
+}
+
+async function loadSeasonBracket(seasonId){
+  try{
+    const d=await GET('/bracket?season_id='+seasonId);
+    DB.bracketMatches=d.matches||[];
+    // attach to season
+    const se=DB.seasons.find(s=>s.id==seasonId);
+    if(se){se.matches=DB.bracketMatches;se.season_players=d.season_players||[]}
+  }catch(e){}
+}
+
+async function doAddPlayer(){
+  const inp=$('#pn');if(!inp)return;
+  const name=inp.value.trim();if(!name)return;
+  const se=DB.currentSeason;
+  const already=(se.season_players||[]).map(p=>p.name||p);
+  if(already.map(n=>n.toLowerCase()).includes(name.toLowerCase()))return toast('Already added',true);
+  if(already.length>=8)return toast('Already have 8 players',true);
+  se.season_players=se.season_players||[];
+  se.season_players.push({name});
+  inp.value='';
+  renderApp();
+}
+
+async function doQuickAdd(name){
+  const se=DB.currentSeason;
+  const already=(se.season_players||[]).map(p=>p.name||p);
+  if(already.length>=8)return toast('Already have 8 players',true);
+  se.season_players=se.season_players||[];
+  se.season_players.push({name});
+  renderApp();
+}
+
+/* ── FULL DATA LOAD AFTER CYCLE SWITCH ── */
+async function loadAll(){
+  await loadCycleData(UI.cycleId);
+  await loadLeaderboard();
+  if(DB.currentSeason){await loadSeasonBracket(DB.currentSeason.id)}
+}
+
+/* ── BOOT ── */
+async function boot(){
+  if(loadAuth()){
+    await init();
+    if(DB.currentSeason&&!DB.currentSeason.done){await loadSeasonBracket(DB.currentSeason.id)}
+    await loadLeaderboard();
+    render();
+  }else{
+    renderAuth();
+  }
+}
+
+boot();
+</script>
+</body></html>
