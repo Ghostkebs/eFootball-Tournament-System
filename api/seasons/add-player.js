@@ -6,32 +6,38 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const admin = requireAdmin(req, res);
+  if (!admin) return;
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const user = requireAdmin(req, res);
-  if (!user) return;
-
-  const { season_id, player_name } = req.body;
-  if (!season_id || !player_name) return res.status(400).json({ error: 'season_id and player_name required' });
+  const { season_id, name } = req.body;
+  if (!season_id || !name?.trim()) return res.status(400).json({ error: 'season_id and name required' });
 
   try {
-    let [p] = await sql`SELECT id FROM players WHERE LOWER(name) = LOWER(${player_name.trim()}) AND deleted_at IS NULL`;
-    if (!p) {
-      [p] = await sql`INSERT INTO players (name) VALUES (${player_name.trim()}) RETURNING id`;
+    // Check season exists and isn't started yet
+    const [season] = await sql`SELECT * FROM seasons WHERE id = ${season_id} AND deleted_at IS NULL`;
+    if (!season) return res.status(404).json({ error: 'Season not found' });
+    if (season.started) return res.status(400).json({ error: 'Season already started' });
+
+    // Check not already 8 players
+    const count = await sql`SELECT COUNT(*) FROM season_players WHERE season_id = ${season_id} AND deleted_at IS NULL`;
+    if (parseInt(count[0].count) >= 8) return res.status(400).json({ error: 'Season already has 8 players' });
+
+    // Get or create player
+    let [player] = await sql`SELECT id FROM players WHERE LOWER(name) = LOWER(${name.trim()}) AND deleted_at IS NULL`;
+    if (!player) {
+      [player] = await sql`INSERT INTO players (name) VALUES (${name.trim()}) RETURNING id`;
     }
 
-    const existing = await sql`SELECT id FROM season_players WHERE season_id = ${season_id} AND player_id = ${p.id} AND deleted_at IS NULL`;
-    if (existing.length > 0) return res.status(409).json({ error: 'Player already added' });
+    // Check not already in this season
+    const exists = await sql`SELECT id FROM season_players WHERE season_id = ${season_id} AND player_id = ${player.id} AND deleted_at IS NULL`;
+    if (exists.length > 0) return res.status(409).json({ error: 'Player already in this season' });
 
-    await sql`INSERT INTO season_players (season_id, player_id) VALUES (${season_id}, ${p.id})`;
+    await sql`INSERT INTO season_players (season_id, player_id) VALUES (${season_id}, ${player.id})`;
 
-    const players = await sql`
-      SELECT p.id, p.name FROM season_players sp
-      JOIN players p ON p.id = sp.player_id
-      WHERE sp.season_id = ${season_id} AND sp.deleted_at IS NULL
-    `;
-
-    return res.status(201).json({ players: players.map(p => ({ id: p.id, name: p.name })) });
+    return res.status(201).json({ message: 'Player added' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error' });
