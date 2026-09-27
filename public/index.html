@@ -318,6 +318,7 @@ function renderPlay(){
       ${quick.length&&isAdmin()?`<h4>Quick add</h4><div class="row">${quick.slice(0,12).map(p=>`<span class="chip" data-qaplayer="${p}">+ ${p}</span>`).join('')}</div>`:''}
       ${added.length===8&&isAdmin()?`<button class="btn" id="btnSetMatchups" style="margin-top:12px">Set Matchups →</button>`:''}
     </div>`;
+   ${isAdmin()?`<button class="btn" id="btnCancelTournament" style="margin-top:14px;background:#e74c3c">Cancel Tournament</button>`:''}
   }
 
   // Step 2: Set matchups
@@ -479,6 +480,15 @@ function bindApp(){
   if(pnInput)pnInput.addEventListener('keydown',e=>{if(e.key==='Enter')doAddPlayer()});
 
   // Quick add
+ const btnCancel=$('#btnCancelTournament');
+if(btnCancel)btnCancel.onclick=async()=>{
+  if(!confirm('Delete this tournament and all players?'))return;
+  try{
+    await POST('/seasons/cancel',{season_id:DB.currentSeason.id});
+    await loadCycleData(UI.cycleId);
+    toast('Tournament cancelled');
+  }catch(e){toast(e.message,true)}
+};
   document.querySelectorAll('[data-qaplayer]').forEach(b=>b.onclick=()=>doQuickAdd(b.dataset.qaplayer));
 
   // Remove player chip
