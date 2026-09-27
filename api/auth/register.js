@@ -9,8 +9,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { username, password, role = 'viewer' } = req.body;
+  const { username, password, role_code } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+
+  // Role is decided server-side only. Never trust a client-supplied 'role' field —
+  // that let anyone call this endpoint directly and register as admin.
+  const ADMIN_CODE = process.env.ADMIN_REGISTRATION_CODE;
+  const role = (ADMIN_CODE && role_code === ADMIN_CODE) ? 'admin' : 'viewer';
 
   try {
     const existing = await sql`SELECT id FROM users WHERE username = ${username}`;
