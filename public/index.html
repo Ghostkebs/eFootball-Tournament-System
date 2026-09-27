@@ -221,7 +221,7 @@ async function loadCycleData(cycleId){
 
 /* ── POLL every 5s when on play view ── */
 let pollTimer;
-function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(UI.view==='play'&&UI.cycleId){await loadCycleData(UI.cycleId);renderApp()}},5000)}
+function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(UI.view==='play'&&UI.cycleId&&DB.currentSeason?.started){await loadCycleData(UI.cycleId);renderApp()}},5000)}
 function stopPoll(){clearInterval(pollTimer)}
 
 /* ── RENDER SHELL ── */
