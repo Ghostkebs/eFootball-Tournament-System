@@ -9,7 +9,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/public/Robinhood Tournament of Champions.html"
+      "dest": "/public/index.html"
     }
   ]
 }
