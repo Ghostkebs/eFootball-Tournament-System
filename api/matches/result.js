@@ -60,10 +60,12 @@ async function autoAdvance(season_id, round, idx, winner_id, loser_id) {
     } else {
       // which slot am I? (first or second feeder for this SF)
       const isFirst = idx === 0 || idx === 2;
-      await sql`INSERT INTO matches (season_id, round, match_index, player_a_id) VALUES (${season_id}, 'sf', ${sfIdx}, ${winner_id})`
-        .catch(() => {});
-      if (!isFirst) {
-        await sql`UPDATE matches SET player_b_id = ${winner_id} WHERE season_id = ${season_id} AND round = 'sf' AND match_index = ${sfIdx}`;
+      if (isFirst) {
+        await sql`INSERT INTO matches (season_id, round, match_index, player_a_id) VALUES (${season_id}, 'sf', ${sfIdx}, ${winner_id})`
+          .catch(() => {});
+      } else {
+        await sql`INSERT INTO matches (season_id, round, match_index, player_b_id) VALUES (${season_id}, 'sf', ${sfIdx}, ${winner_id})`
+          .catch(() => {});
       }
     }
   }
