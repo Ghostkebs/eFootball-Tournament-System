@@ -380,7 +380,8 @@ function renderBracket(se,editable){
     const canScore=editable&&m.player_a_id&&m.player_b_id&&!m.locked;
     const canEdit=editable&&m.locked&&isAdmin();
     return`<div class="mt ${canScore?'live':''}">
-      ${canScore?`<div class="in"><input type="number" min="0" id="sa${m.id}" placeholder="0"><input type="number" min="0" id="sb${m.id}" placeholder="0"><button class="btn" data-lockm="${m.id}">Lock</button></div>`:''}
+     ${canScore?`<div class="in"><input type="number" min="0" id="sa${m.id}" placeholder="0"><input type="number" min="0" id="sb${m.id}" placeholder="0"><button class="btn" data-lockm="${m.id}">Lock</button></div>`:''}
+      ${canEdit?`<div class="in"><input type="number" min="0" id="sa${m.id}" placeholder="${m.score_a}"><input type="number" min="0" id="sb${m.id}" placeholder="${m.score_b}"><button class="btn" style="background:#e67e22" data-editm="${m.id}">Edit</button></div>`:''}
     </div>`;
   };
 
@@ -465,6 +466,19 @@ async function showProfile(name){
 function bindApp(){
   // Cycle switch
   document.querySelectorAll('[data-switchchcycle]').forEach(b=>b.onclick=async()=>{
+   document.querySelectorAll('[data-editm]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.editm;
+    const sa=document.getElementById('sa'+id)?.value;
+    const sb=document.getElementById('sb'+id)?.value;
+    if(sa===''||sb==='')return toast('Enter both scores',true);
+    if(sa===sb)return toast('No draws allowed',true);
+    try{
+      await POST('/matches/edit',{match_id:id,score_a:+sa,score_b:+sb});
+      await loadCycleData(UI.cycleId);
+      renderApp();
+      toast('Result updated!');
+    }catch(e){toast(e.message,true)}
+  });
     UI.cycleId=+b.dataset.switchchcycle;
     await loadCycleData(UI.cycleId);
     await loadLeaderboard();
