@@ -378,7 +378,8 @@ function renderBracket(se,editable){
     const rowA=`<div class="tm ${w&&w==m.player_a_id?'w':''}"><span>${m.player_a_name||'TBD'}</span>${m.score_a!=null?`<b>${m.score_a}</b>`:''}</div>`;
     const rowB=`<div class="tm ${w&&w==m.player_b_id?'w':''}"><span>${m.player_b_name||'TBD'}</span>${m.score_b!=null?`<b>${m.score_b}</b>`:''}</div>`;
     const canScore=editable&&m.player_a_id&&m.player_b_id&&!m.locked;
-    return`<div class="mt ${canScore?'live':''}">${rowA}${rowB}
+    const canEdit=editable&&m.locked&&isAdmin();
+    return`<div class="mt ${canScore?'live':''}">
       ${canScore?`<div class="in"><input type="number" min="0" id="sa${m.id}" placeholder="0"><input type="number" min="0" id="sb${m.id}" placeholder="0"><button class="btn" data-lockm="${m.id}">Lock</button></div>`:''}
     </div>`;
   };
