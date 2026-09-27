@@ -291,7 +291,18 @@ function renderPlay(){
     return`<div class="card"><h2>Welcome</h2><p class="mu">No cycles exist yet. Start the first one to begin.</p><button class="btn" id="btnNewCycle">Start Cycle 1</button></div>`;
   }
   const se=DB.currentSeason;
-  if(!se)return`<div class="card"><p class="mu">No active season.</p></div>`;
+  if(!se){
+    const completedCount=DB.seasons?DB.seasons.filter(s=>s.done).length:0;
+    const allDone=completedCount>=10;
+    if(!isAdmin())return`<div class="card"><p class="mu">No active season. Ask your admin to start one.</p></div>`;
+    return`<div class="card"><h2>No Active Season</h2><p class="mu">${allDone?'All 10 seasons complete. Start a new cycle.':'The previous tournament was cancelled. Start a new one.'}</p>
+      <div class="row" style="margin-top:12px">
+        ${allDone
+          ?`<button class="btn" id="btnNewCycle">Start New Cycle</button>`
+          :`<button class="btn" id="btnNextSeason">Start Season ${completedCount+1}</button>`}
+      </div>
+    </div>`;
+  }
   const cycNum=DB.currentCycle?.cycle_number||'';
   const head=`<div class="ch"><h2>Cycle ${cycNum} · Season ${se.season_number}</h2><span class="tag">${se.done?'Locked':se.started?'In play':se.season_players?.length>=8?'Step 2 of 3':'Step 1 of 3'}</span></div>`;
 
@@ -407,9 +418,12 @@ function renderSeasons(){
 function renderPlayers(){
   const pl=DB.players||[];
   return`<div class="card"><div class="ch"><h2>All Players</h2><span class="tag">${pl.length} on record</span></div>
-    <div class="grid">${pl.map(p=>`<div class="pc" data-a="pf" data-n="${p.name}">
-      <b>${p.name}</b>
-      <span>${p.career_points||0} career pts · ${p.seasons_played||0} seasons · ${p.titles||0} titles</span>
+    <div class="grid">${pl.map(p=>`<div class="pc" style="position:relative">
+      <div data-a="pf" data-n="${p.name}" style="cursor:pointer">
+        <b>${p.name}</b>
+        <span>${p.career_points||0} career pts · ${p.seasons_played||0} seasons · ${p.titles||0} titles</span>
+      </div>
+      ${isAdmin()?`<button class="btn red" data-deleteplayer="${p.name}" style="position:absolute;top:8px;right:8px;padding:4px 8px;font-size:11px;border:1px solid #c0392b;background:none;color:#e74c3c;border-radius:8px">✕</button>`:''}
     </div>`).join('')||'<p class="mu">No players yet.</p>'}
     </div></div>`;
 }
@@ -458,6 +472,20 @@ function bindApp(){
   // Player profile
   document.querySelectorAll('[data-a="pf"]').forEach(b=>b.onclick=()=>showProfile(b.dataset.n));
 
+  // Delete player
+  document.querySelectorAll('[data-deleteplayer]').forEach(b=>b.onclick=async(e)=>{
+    e.stopPropagation();
+    const name=b.dataset.deleteplayer;
+    if(!confirm(`Remove "${name}" from the system?\n\nNote: Players with completed season records cannot be deleted.`))return;
+    b.disabled=true;
+    try{
+      await api('DELETE','/players',{name});
+      const{players}=await GET('/players');DB.players=players||[];
+      renderApp();
+      toast(name+' removed');
+    }catch(e){toast(e.message,true);b.disabled=false}
+  });
+
   // New cycle
   const btnNC=$('#btnNewCycle');
   if(btnNC)btnNC.onclick=async()=>{
@@ -495,6 +523,7 @@ function bindApp(){
       UI._step=null;
       await loadCycleData(UI.cycleId);
       await loadLeaderboard();
+      const{players}=await GET('/players');DB.players=players||[];
       renderApp();
       toast('Tournament cancelled');
     }catch(e){toast(e.message,true);btnCancel.disabled=false}
