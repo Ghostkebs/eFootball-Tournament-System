@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     if (parseInt(count[0].count) >= 8) return res.status(400).json({ error: 'Season already has 8 players' });
 
     // Get or create player — search ALL records (including soft-deleted) to avoid unique constraint crash
-    let [player] = await sql`SELECT id FROM players WHERE LOWER(name) = LOWER(${name.trim()})`;
+    let [player] = await sql`SELECT id, deleted_at FROM players WHERE LOWER(name) = LOWER(${name.trim()})`;
 if (!player) {
   try {
     [player] = await sql`INSERT INTO players (name) VALUES (${name.trim()}) RETURNING id`;
