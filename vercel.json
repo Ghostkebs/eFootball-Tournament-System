@@ -1,4 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "echo 'Ready'"
+  "buildCommand": "echo 'Ready'",
+  "outputDirectory": "public",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/Robinhood Tournament of Champions.html"
+    }
+  ]
 }
