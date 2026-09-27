@@ -221,7 +221,16 @@ async function loadCycleData(cycleId){
 
 /* ── POLL every 5s when on play view ── */
 let pollTimer;
-function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(UI.view==='play'&&UI.cycleId&&DB.currentSeason?.started){await loadCycleData(UI.cycleId);renderApp()}},5000)}
+function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(async()=>{
+  if(UI.view==='play'&&UI.cycleId&&DB.currentSeason?.started){
+    const activeInput=document.activeElement;
+    const typingScore=activeInput&&activeInput.tagName==='INPUT'&&activeInput.type==='number';
+    const anyFilled=[...document.querySelectorAll('input[type=number]')].some(i=>i.value!=='');
+    if(typingScore||anyFilled)return;
+    await loadSeasonBracket(DB.currentSeason.id);
+    renderApp();
+  }
+},5000)}
 function stopPoll(){clearInterval(pollTimer)}
 
 /* ── RENDER SHELL ── */
@@ -590,11 +599,16 @@ document.querySelectorAll('[data-rmplayer]').forEach(b=>b.onclick=async()=>{
     try{
       await POST('/matches/result',{match_id:+mid,score_a:a,score_b:bv});
       const se=DB.currentSeason;
-      await loadCycleData(UI.cycleId);
+      // Only reload bracket — avoids full re-render that clears other score inputs
       await loadSeasonBracket(se.id);
-      const{players}=await GET('/players');DB.players=players;
-      await loadLeaderboard();
-      if(DB.currentSeason?.done)toast('Season locked! Points awarded 🏆');
+      const updatedSeason=DB.seasons.find(s=>s.id==se.id);
+      if(updatedSeason?.done){
+        // Season just finished — full refresh for leaderboard and points
+        await loadCycleData(UI.cycleId);
+        const{players}=await GET('/players');DB.players=players||[];
+        await loadLeaderboard();
+        toast('Season locked! Points awarded');
+      }
       renderApp();
     }catch(e){toast(e.message,true);b.disabled=false}
   });
