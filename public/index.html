@@ -571,7 +571,6 @@ async function doAddPlayer(){
   inp.value='';
   renderApp();
 }
-
 async function doQuickAdd(name){
   const se=DB.currentSeason;
   const already=(se.season_players||[]).map(p=>p.name||p);
