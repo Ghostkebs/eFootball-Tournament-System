@@ -6,11 +6,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const admin = requireAdmin(req, res);
   if (!admin) return;
-
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { season_id, name } = req.body;
   if (!season_id || !name?.trim()) return res.status(400).json({ error: 'season_id and name required' });
@@ -25,10 +24,14 @@ export default async function handler(req, res) {
     const count = await sql`SELECT COUNT(*) FROM season_players WHERE season_id = ${season_id} AND deleted_at IS NULL`;
     if (parseInt(count[0].count) >= 8) return res.status(400).json({ error: 'Season already has 8 players' });
 
-    // Get or create player
-    let [player] = await sql`SELECT id FROM players WHERE LOWER(name) = LOWER(${name.trim()}) AND deleted_at IS NULL`;
+    // Get or create player — search ALL records (including soft-deleted) to avoid unique constraint crash
+    let [player] = await sql`SELECT id, deleted_at FROM players WHERE LOWER(name) = LOWER(${name.trim()})`;
     if (!player) {
+      // Brand new player
       [player] = await sql`INSERT INTO players (name) VALUES (${name.trim()}) RETURNING id`;
+    } else if (player.deleted_at) {
+      // Player was deleted — restore them
+      await sql`UPDATE players SET deleted_at = NULL WHERE id = ${player.id}`;
     }
 
     // Check not already in this season
