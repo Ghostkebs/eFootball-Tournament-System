@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     try {
       const seasons = await sql`
         SELECT s.*, 
-          array_agg(p.name ORDER BY sp.placement ASC) FILTER (WHERE p.id IS NOT NULL) AS players
+          array_agg(p.name ORDER BY sp.placement ASC) FILTER (WHERE p.id IS NOT NULL) AS season_players
         FROM seasons s
         LEFT JOIN season_players sp ON sp.season_id = s.id AND sp.deleted_at IS NULL
         LEFT JOIN players p ON p.id = sp.player_id AND p.deleted_at IS NULL
