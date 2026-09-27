@@ -3,7 +3,7 @@ import { requireAuth, requireAdmin } from '../_auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -44,6 +44,30 @@ export default async function handler(req, res) {
         INSERT INTO players (name) VALUES (${name.trim()}) RETURNING *
       `;
       return res.status(201).json({ player });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  }
+
+  if (req.method === 'DELETE') {
+    const admin = requireAdmin(req, res);
+    if (!admin) return;
+    const { name } = req.body;
+    if (!name?.trim()) return res.status(400).json({ error: 'Name required' });
+
+    try {
+      const [player] = await sql`SELECT id FROM players WHERE LOWER(name) = LOWER(${name.trim()}) AND deleted_at IS NULL`;
+      if (!player) return res.status(404).json({ error: 'Player not found' });
+
+      // Block deletion if player has completed seasons (career data)
+      const [hasResults] = await sql`SELECT COUNT(*) as n FROM season_players sp JOIN seasons s ON s.id = sp.season_id WHERE sp.player_id = ${player.id} AND s.done = true AND sp.deleted_at IS NULL`;
+      if (parseInt(hasResults.n) > 0) return res.status(400).json({ error: 'Cannot delete a player with completed seasons. Their record is part of tournament history.' });
+
+      await sql`UPDATE players SET deleted_at = NOW() WHERE id = ${player.id}`;
+      await sql`UPDATE season_players SET deleted_at = NOW() WHERE player_id = ${player.id}`;
+
+      return res.status(200).json({ message: 'Player deleted' });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: 'Server error' });
